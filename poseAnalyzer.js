@@ -112,7 +112,7 @@ async function analyze(imageLocation) {
     }
 
     console.log(didHitDepth)
-    hitDepthArray.insert(didHitDepth)
+    hitDepthArray.push(didHitDepth)
 
     var buf = canvas.toBuffer();
     // return buf
