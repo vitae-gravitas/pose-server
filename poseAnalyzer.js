@@ -5,18 +5,17 @@ const ffmpeg2 = require('fluent-ffmpeg');
 const fs = require('fs');
 const _ = require('lodash');
 const {createCanvas, loadImage} = require('canvas');
-var firebase = require('firebase')
 var admin = require("firebase-admin");
 var serviceAccount = require("./vitae-gravitas-firebase-adminsdk-hp87l-0c32b80f4d.json");
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    storageBucket: "vitae-gravitas.appspot.com"
+    storageBucket: "vitae-gravitas.appspot.com",
+    databaseURL: "https://vitae-gravitas.firebaseio.com"
 });
 var bucket = admin.storage().bucket();
+var db = admin.database();
+
 var net = null;
-
-var firebaseInitialized = false;
-
 
 var hitDepthArray = []
 
@@ -128,23 +127,6 @@ async function analyzeImage (inputLocationInDB, outputLocationInDB) {
 }
 
 var analyzeListOfImages = async function(requestBody) {
-    if (!firebaseInitialized) {
-        console.log("initializing firebase for the first time")
-        var firebaseConfig = {
-            apiKey: "AIzaSyAWqPZzjz4nwnmZFTAOZHC0UPvvfx7Zjr4",
-            authDomain: "vitae-gravitas.firebaseapp.com",
-            databaseURL: "https://vitae-gravitas.firebaseio.com",
-            projectId: "vitae-gravitas",
-            storageBucket: "vitae-gravitas.appspot.com",
-            messagingSenderId: "243832898974",
-            appId: "1:243832898974:web:3ad216cac866cf85"
-        };
-
-        await firebase.initializeApp(firebaseConfig);
-        firebaseInitialized = true
-    } else {
-        console.log("firebase has already been initialized")
-    }
 
     didHitDepth = []
     console.log("running list images method")
@@ -153,9 +135,10 @@ var analyzeListOfImages = async function(requestBody) {
         await analyzeImage(requestBody.imageLocations[i], requestBody.outputLocations[i])
     }
 
-    // var ref = firebase.database().ref(requestBody.videoId);
-    // var data = {"hit_depths": didHitDepth};
-    // ref.update(data);
+    var ref = db.ref(requestBody.videoId);
+    var data = {"hit_depths": didHitDepth};
+    ref.update(data);
+    
 
 }
 
