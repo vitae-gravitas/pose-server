@@ -23,8 +23,8 @@ async function loadNet() {
     net = await posenet.load({
         architecture: 'ResNet50',
         outputStride: 32,
-        inputResolution: 161,
-        quantBytes: 1
+        inputResolution: 353,
+        quantBytes: 2
     });
 }
 
@@ -143,8 +143,12 @@ var analyzeListOfImages = async function(requestBody) {
         console.log("analyzing " + requestBody.imageLocations[i])
         var fileWasSaved = await analyzeImage(requestBody.imageLocations[i], requestBody.outputLocations[i])
         console.log("exited the await statement")
+
         var percentage = ((i + 1.0)/requestBody.imageLocations.length) * 100
-        await ref.child("pose_completed").set(percentage)
+        if (percentage < 100) {
+            await ref.child("pose_completed").set(percentage)
+        }
+        
     }
 
     console.log("database directory " + requestBody.videoId);
@@ -153,6 +157,8 @@ var analyzeListOfImages = async function(requestBody) {
     // var data = {"hit_depths": hitDepthArray};
     // console.log(data)
     await ref.child("hit_depths").set(hitDepthArray)
+    await ref.child("pose_completed").set(100)
+
     
     console.log("depth values were uploaded to database")
     // .then(data => {
