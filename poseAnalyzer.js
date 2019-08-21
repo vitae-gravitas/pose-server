@@ -18,9 +18,9 @@ var net = null;
 async function loadNet() {
     net = await posenet.load({
         architecture: 'ResNet50',
-        outputStride: 16,
-        inputResolution: 801,
-        quantBytes: 4
+        outputStride: 32,
+        inputResolution: 161,
+        quantBytes: 1
     });
 }
 
