@@ -145,9 +145,9 @@ var analyzeListOfImages = async function(requestBody) {
         await analyzeImage(requestBody.imageLocations[i], requestBody.outputLocations[i])
     }
 
-    var ref = firebase.database().ref(requestBody.videoId);
-    var data = {"hit_depths": didHitDepth};
-    ref.update(data);
+    // var ref = firebase.database().ref(requestBody.videoId);
+    // var data = {"hit_depths": didHitDepth};
+    // ref.update(data);
 
 }
 
