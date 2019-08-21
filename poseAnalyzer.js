@@ -111,34 +111,53 @@ async function analyze(imageLocation) {
 }
 
 async function analyzeImage (inputLocationInDB, outputLocationInDB) {
-    bucket.file(inputLocationInDB).download(function(err, contents) {
-        console.log(inputLocationInDB + " was downloaded")
-        analyze(contents).then(result => {
-            console.log(inputLocationInDB + " was analyzed")
-            const file = bucket.file(outputLocationInDB);
-            file.save(result, function(err) {
-                if (!err) {
-                    // File written successfully.
-                    console.log("result was saved to db")
-                }
-            });
-        });
+    var data = await bucket.file(inputLocationInDB).download()
+    var contents = data[0]
+
+    console.log(inputLocationInDB + " was downloaded")
+
+    var result = await analyze(contents)
+
+    
+    console.log(inputLocationInDB + " was analyzed")
+    const file = bucket.file(outputLocationInDB);
+    await file.save(result, function(err) {
+        // if (!err) {
+        //     // File written successfully.
+        //     console.log("result was saved to db")
+        // }
+
+        // return !err;
     });
+    console.log("result was saved to db");
+    return true;
+
 }
 
 var analyzeListOfImages = async function(requestBody) {
 
-    didHitDepth = []
+    hitDepthArray = []
+    var ref = db.ref(requestBody.videoId);
     console.log("running list images method")
     for (var i = 0; i < requestBody.imageLocations.length; i++) {
         console.log("analyzing " + requestBody.imageLocations[i])
-        await analyzeImage(requestBody.imageLocations[i], requestBody.outputLocations[i])
+        var fileWasSaved = await analyzeImage(requestBody.imageLocations[i], requestBody.outputLocations[i])
+        console.log("exited the await statement")
+        var percentage = ((i + 1.0)/requestBody.imageLocations.length) * 100
+        await ref.child("pose_completed").set(percentage)
     }
 
-    var ref = db.ref(requestBody.videoId);
-    var data = {"hit_depths": didHitDepth};
-    ref.update(data);
+    console.log("database directory " + requestBody.videoId);
     
+    
+    // var data = {"hit_depths": hitDepthArray};
+    // console.log(data)
+    await ref.child("hit_depths").set(hitDepthArray)
+    
+    console.log("depth values were uploaded to database")
+    // .then(data => {
+    //     console.log("depth values were uploaded to database")
+    // });
 
 }
 
