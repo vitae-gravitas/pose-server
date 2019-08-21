@@ -26,12 +26,12 @@
     "@tensorflow/tfjs-core": "^1.2.7",
     "@tensorflow/tfjs-node": "^1.2.7",
     "@tensorflow/tfjs-node-gpu": "^1.2.7",
+    "@tensorflow/tfjs-core@": "^1.2.7",
     "canvas": "^2.5.0",
     "ffmpeg": "0.0.4",
     "firebase": "^6.4.0",
     "firebase-admin": "^8.3.0",
     "fluent-ffmpeg": "^2.1.2",
-    "lodash": "^4.17.15",
     "videoshow": "^0.1.11"
   },
   "devDependencies": {
