@@ -15,6 +15,21 @@ admin.initializeApp({
 var bucket = admin.storage().bucket();
 var net = null;
 
+var firebase = require('firebase')
+var firebaseConfig = {
+    apiKey: "AIzaSyAWqPZzjz4nwnmZFTAOZHC0UPvvfx7Zjr4",
+    authDomain: "vitae-gravitas.firebaseapp.com",
+    databaseURL: "https://vitae-gravitas.firebaseio.com",
+    projectId: "vitae-gravitas",
+    storageBucket: "vitae-gravitas.appspot.com",
+    messagingSenderId: "243832898974",
+    appId: "1:243832898974:web:3ad216cac866cf85"
+};
+
+firebase.initializeApp(firebaseConfig)
+
+var hitDepthArray = []
+
 async function loadNet() {
     net = await posenet.load({
         architecture: 'ResNet50',
@@ -97,6 +112,7 @@ async function analyze(imageLocation) {
     }
 
     console.log(didHitDepth)
+    hitDepthArray.insert(didHitDepth)
 
     var buf = canvas.toBuffer();
     // return buf
@@ -122,11 +138,19 @@ async function analyzeImage (inputLocationInDB, outputLocationInDB) {
 }
 
 var analyzeListOfImages = async function(requestBody) {
+    didHitDepth = []
     console.log("running list images method")
     for (var i = 0; i < requestBody.imageLocations.length; i++) {
         console.log("analyzing " + requestBody.imageLocations[i])
-        analyzeImage(requestBody.imageLocations[i], requestBody.outputLocations[i])
+        await analyzeImage(requestBody.imageLocations[i], requestBody.outputLocations[i])
     }
+
+    var ref = firebase.database().ref(requestBody.videoId);
+    var data = {"hit_depths": didHitDepth};
+    ref.update(data);
+
+
+
 }
 
 module.exports = analyzeListOfImages;
