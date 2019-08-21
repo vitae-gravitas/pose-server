@@ -12,8 +12,8 @@ app.post('/api/tasks/', (req, res) => {
   // res.send(req.params.timestamp_filename)
 
   //WRITE CODE TO SEE IF VIDEO EXISTS IN FIREBASE
-  var videoExists = true
-  if (!videoExists) return res.status(404).send('Video does not exist in the database')
+  // var videoExists = true
+  // if (!videoExists) return res.status(404).send('Video does not exist in the database')
   console.log(req.body)
   poseAnalyzerMethod(req.body)
   res.status(200).send("success");
