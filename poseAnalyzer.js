@@ -5,7 +5,7 @@ const ffmpeg2 = require('fluent-ffmpeg');
 const fs = require('fs');
 const _ = require('lodash');
 const {createCanvas, loadImage} = require('canvas');
-
+var firebase = require('firebase')
 var admin = require("firebase-admin");
 var serviceAccount = require("./vitae-gravitas-firebase-adminsdk-hp87l-0c32b80f4d.json");
 admin.initializeApp({
@@ -15,18 +15,8 @@ admin.initializeApp({
 var bucket = admin.storage().bucket();
 var net = null;
 
-// var firebase = require('firebase')
-// var firebaseConfig = {
-//     apiKey: "AIzaSyAWqPZzjz4nwnmZFTAOZHC0UPvvfx7Zjr4",
-//     authDomain: "vitae-gravitas.firebaseapp.com",
-//     databaseURL: "https://vitae-gravitas.firebaseio.com",
-//     projectId: "vitae-gravitas",
-//     storageBucket: "vitae-gravitas.appspot.com",
-//     messagingSenderId: "243832898974",
-//     appId: "1:243832898974:web:3ad216cac866cf85"
-// };
+var firebaseInitialized = false;
 
-// firebase.initializeApp(firebaseConfig);
 
 var hitDepthArray = []
 
@@ -138,6 +128,24 @@ async function analyzeImage (inputLocationInDB, outputLocationInDB) {
 }
 
 var analyzeListOfImages = async function(requestBody) {
+    if (!firebaseInitialized) {
+        console.log("initializing firebase for the first time")
+        var firebaseConfig = {
+            apiKey: "AIzaSyAWqPZzjz4nwnmZFTAOZHC0UPvvfx7Zjr4",
+            authDomain: "vitae-gravitas.firebaseapp.com",
+            databaseURL: "https://vitae-gravitas.firebaseio.com",
+            projectId: "vitae-gravitas",
+            storageBucket: "vitae-gravitas.appspot.com",
+            messagingSenderId: "243832898974",
+            appId: "1:243832898974:web:3ad216cac866cf85"
+        };
+
+        await firebase.initializeApp(firebaseConfig);
+        firebaseInitialized = true
+    } else {
+        console.log("firebase has already been initialized")
+    }
+
     didHitDepth = []
     console.log("running list images method")
     for (var i = 0; i < requestBody.imageLocations.length; i++) {
