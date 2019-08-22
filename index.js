@@ -15,11 +15,11 @@ app.post('/api/tasks/', (req, res) => {
   // var videoExists = true
   // if (!videoExists) return res.status(404).send('Video does not exist in the database')
   console.log(req.body)
+  res.status(200).send("server has recieved post request and will begin work...");
   poseAnalyzerMethod(req.body).then(data => {
-    res.status(200).send("success");
     console.log("finished the whole post request")
   })
-  
+  console.log("return from express app.post method")
   return;
   
 

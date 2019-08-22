@@ -33,6 +33,7 @@ async function analyze(imageLocation) {
     if (net == null) {
         console.log("loading net for the first time")
         await loadNet()
+        console.log("finished loading net for the first time")
     } else {
         console.log("net already loaded")
     }
@@ -56,13 +57,14 @@ async function analyze(imageLocation) {
         ["rightHip", "rightKnee"],
         ["rightKnee", "rightAnkle"],
     ];
-    console.log("test2")
+    console.log(imageLocation + " is about to be loaded")
     const image = await loadImage(imageLocation);
     const canvas = createCanvas(image.width, image.height);
     const ctx = canvas.getContext('2d');
     ctx.drawImage(image, 0, 0);
+    console.log(imageLocation + " will have predictions run through the net")
     const pose = await net.estimateSinglePose(ctx.canvas);
-    console.log("test3")
+    console.log("prediction for " + imageLocation + " is complete and drawing will begin")
     pose.keypoints.forEach(keypoint => {
         const {position: {x, y}} = keypoint;
         ctx.beginPath();
@@ -90,7 +92,7 @@ async function analyze(imageLocation) {
 
         }
     })
-    console.log("test4")
+    console.log("drawing complete and depth boolean will be computed")
     const leftDepthConfidence = pointsByPart['leftKnee']['score'] + pointsByPart['leftHip']['score']
     const rightDepthConfidence = pointsByPart['rightKnee']['score'] + pointsByPart['rightHip']['score']
     var didHitDepth = false
@@ -100,13 +102,13 @@ async function analyze(imageLocation) {
         didHitDepth = pointsByPart['rightKnee']['position']['y'] < pointsByPart['rightHip']['position']['y']
     }
 
-    console.log(didHitDepth)
+    console.log("depth boolean: " + didHitDepth)
     hitDepthArray.push(didHitDepth)
 
     var buf = canvas.toBuffer();
     // return buf
     // fs.writeFileSync("test.png", buf);
-
+    console.log("buffer for "+ imageLocation + " is about to be returned")
     return buf     
 }
 
@@ -114,7 +116,8 @@ async function analyzeImage (inputLocationInDB, outputLocationInDB) {
     var data = await bucket.file(inputLocationInDB).download()
     var contents = data[0]
 
-    console.log(inputLocationInDB + " was downloaded")
+    console.log(inputLocationInDB + " was downloaded: ")
+    console.log(contents)
 
     var result = await analyze(contents)
 
@@ -138,7 +141,7 @@ var analyzeListOfImages = async function(requestBody) {
 
     hitDepthArray = []
     var ref = db.ref(requestBody.videoId);
-    console.log("running list images method")
+    console.log("running analyze list images method")
     for (var i = 0; i < requestBody.imageLocations.length; i++) {
         console.log("analyzing " + requestBody.imageLocations[i])
         var fileWasSaved = await analyzeImage(requestBody.imageLocations[i], requestBody.outputLocations[i])
@@ -160,7 +163,7 @@ var analyzeListOfImages = async function(requestBody) {
     await ref.child("pose_completed").set(100)
 
     
-    console.log("depth values were uploaded to database")
+    console.log("depth values were uploaded to database and method will return")
     // .then(data => {
     //     console.log("depth values were uploaded to database")
     // });
