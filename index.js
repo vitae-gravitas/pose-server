@@ -15,8 +15,13 @@ app.post('/api/tasks/', (req, res) => {
   // var videoExists = true
   // if (!videoExists) return res.status(404).send('Video does not exist in the database')
   console.log(req.body)
-  poseAnalyzerMethod(req.body)
-  res.status(200).send("success");
+  poseAnalyzerMethod(req.body).then(data => {
+    res.status(200).send("success");
+    console.log("finished the whole post request")
+  })
+  
+  return;
+  
 
  
 });

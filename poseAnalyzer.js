@@ -165,6 +165,8 @@ var analyzeListOfImages = async function(requestBody) {
     //     console.log("depth values were uploaded to database")
     // });
 
+    return;
+
 }
 
 module.exports = analyzeListOfImages;
