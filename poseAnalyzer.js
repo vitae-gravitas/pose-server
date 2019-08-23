@@ -22,9 +22,9 @@ var hitDepthArray = []
 async function loadNet() {
     net = await posenet.load({
         architecture: 'ResNet50',
-        outputStride: 32,
-        inputResolution: 257,
-        quantBytes: 2
+        outputStride: 16,
+        inputResolution: 801,
+        quantBytes: 4
     });
 }
 
