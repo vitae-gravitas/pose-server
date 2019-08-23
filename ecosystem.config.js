@@ -10,7 +10,7 @@ module.exports = {
       key: '~/desktop/pose.pem',
       ref: 'origin/master',
       repo: 'https://github.com/vitae-gravitas/pose-server.git',
-      path: '/home/ubuntu/poser-server',
+      path: '/home/ubuntu/pose-server',
       'post-deploy': 'npm install && pm2 startOrRestart ecosystem.config.js'
     }
   }
