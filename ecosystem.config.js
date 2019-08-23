@@ -11,7 +11,7 @@ module.exports = {
       ref: 'origin/master',
       repo: 'https://github.com/vitae-gravitas/pose-server.git',
       path: '/home/ubuntu/pose-server',
-      'post-deploy': 'npm install && pm2 startOrRestart ecosystem.config.js'
+      'post-deploy': 'conda activate tf_gpu14_p35 && npm install && pm2 startOrRestart ecosystem.config.js'
     }
   }
 }
