@@ -5,7 +5,7 @@ app.use(express.json())
 var poseAnalyzerMethod = require("./poseAnalyzer.js")
 
 app.get('/', (req, res) => {
-  res.send('Server should be working now!')
+  res.send('Server should be working now!');
 })
 
 app.post('/api/tasks/', (req, res) => {
@@ -15,7 +15,8 @@ app.post('/api/tasks/', (req, res) => {
   // var videoExists = true
   // if (!videoExists) return res.status(404).send('Video does not exist in the database')
   console.log(req.body)
-  res.status(200).send("server has recieved post request and will begin work...");
+  // res.status(200).send("server has recieved post request and will begin work...");
+  res.end("the post request will continue but this request will be ended")
   poseAnalyzerMethod(req.body).then(data => {
     console.log("finished the whole post request")
   })
