@@ -57,14 +57,14 @@ async function analyze(imageLocation) {
         ["rightHip", "rightKnee"],
         ["rightKnee", "rightAnkle"],
     ];
-    console.log(imageLocation + " is about to be loaded")
+    console.log("image is about to be loaded")
     const image = await loadImage(imageLocation);
     const canvas = createCanvas(image.width, image.height);
     const ctx = canvas.getContext('2d');
     ctx.drawImage(image, 0, 0);
-    console.log(imageLocation + " will have predictions run through the net")
+    console.log("image will have predictions run through the net")
     const pose = await net.estimateSinglePose(ctx.canvas);
-    console.log("prediction for " + imageLocation + " is complete and drawing will begin")
+    console.log("prediction for image is complete and drawing will begin")
     pose.keypoints.forEach(keypoint => {
         const {position: {x, y}} = keypoint;
         ctx.beginPath();
@@ -108,7 +108,7 @@ async function analyze(imageLocation) {
     var buf = canvas.toBuffer();
     // return buf
     // fs.writeFileSync("test.png", buf);
-    console.log("buffer for "+ imageLocation + " is about to be returned")
+    console.log("buffer for image is about to be returned")
     return buf     
 }
 
