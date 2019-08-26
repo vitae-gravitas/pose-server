@@ -69,10 +69,10 @@ async function analyze(imageLocation) {
         const {position: {x, y}} = keypoint;
         ctx.beginPath();
         ctx.arc(x, y, 5, 0, 2 * Math.PI, false);
-        ctx.fillStyle = 'black';
+        ctx.fillStyle = 'red';
         ctx.fill();
         ctx.lineWidth = 2;
-        ctx.strokeStyle = 'rgba(0,0,0,1)';
+        ctx.strokeStyle = 'red';
         ctx.stroke();
     });
 
@@ -85,8 +85,8 @@ async function analyze(imageLocation) {
             const {position: {x: x2, y: y2}} = pointsByPart[b];
             ctx.beginPath();
             ctx.moveTo(x1, y1);
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = 'rgba(0,0,0,1)';
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = 'red';
             ctx.lineTo(x2, y2);
             ctx.stroke();
 
