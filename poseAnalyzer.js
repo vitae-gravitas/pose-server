@@ -1,5 +1,7 @@
-require('@tensorflow/tfjs-node-gpu');
+require('@tensorflow/tfjs-node');
 const posenet = require('@tensorflow-models/posenet');
+const bodyPix = require('@tensorflow-models/body-pix');
+const cocoSsd = require('@tensorflow-models/coco-ssd');
 const ffmpeg = require('ffmpeg');
 const ffmpeg2 = require('fluent-ffmpeg');
 const fs = require('fs');
@@ -15,22 +17,35 @@ admin.initializeApp({
 var bucket = admin.storage().bucket();
 var db = admin.database();
 
-var net = null;
+var jointnet = null;
+var humandetectionModel = null;
+var bodySegmentation = null;
 
 var hitDepthArray = []
 
 async function loadNet() {
-    net = await posenet.load({
+    
+//    [jointnet, humandetectionModel] = await Promise.all([posenet.load({
+//        architecture: 'ResNet50',
+//        outputStride: 16,
+//        inputResolution: 801,
+//        quantBytes: 4
+//    }), cocoSsd.load()]);
+    jointnet = await posenet.load({
         architecture: 'ResNet50',
         outputStride: 16,
         inputResolution: 801,
         quantBytes: 4
     });
+
+    humandetectionModel = await cocoSsd.load();
+    
+    bodySegmentation = await bodyPix.load(1.0);
 }
 
 async function analyze(imageLocation) {
     console.log("test1")
-    if (net == null) {
+    if (jointnet == null) {
         console.log("loading net for the first time")
         await loadNet()
         console.log("finished loading net for the first time")
@@ -59,11 +74,34 @@ async function analyze(imageLocation) {
     ];
     console.log("image is about to be loaded")
     const image = await loadImage(imageLocation);
-    const canvas = createCanvas(image.width, image.height);
-    const ctx = canvas.getContext('2d');
+    var orginalCanvas = createCanvas(image.width, image.height);
+    var ctx = orginalCanvas.getContext('2d');
     ctx.drawImage(image, 0, 0);
     console.log("image will have predictions run through the net")
-    const pose = await net.estimateSinglePose(ctx.canvas);
+    const boundingboxes = await humandetectionModel.detect(ctx.canvas)
+    console.log(boundingboxes)
+    boundingboxes.some(function(object){
+        if (object['class'] == 'person') {
+            ctx.strokeStyle = 'blue';
+            var bboxdata = object['bbox']
+            var personFocusedCanvas = createCanvas(bboxdata[2], bboxdata[3])
+            var personFocusedCtx = personFocusedCanvas.getContext('2d')
+            personFocusedCtx.drawImage(ctx.canvas, bboxdata[0], bboxdata[1], bboxdata[2], bboxdata[3], 0, 0, bboxdata[2], bboxdata[3])
+            ctx.rect(bboxdata[0], bboxdata[1], bboxdata[2], bboxdata[3])
+            ctx.stroke();
+//            ctx.clip();
+//            orginalCanvas = personFocusedCanvas
+//            ctx = personFocusedCtx
+            
+        }
+        
+        return object['class'] == 'person';
+    });
+    
+    
+    
+    const pose = await jointnet.estimateSinglePose(ctx.canvas);
+    
     console.log("prediction for image is complete and drawing will begin")
     pose.keypoints.forEach(keypoint => {
         const {position: {x, y}} = keypoint;
@@ -105,7 +143,7 @@ async function analyze(imageLocation) {
     console.log("depth boolean: " + didHitDepth)
     hitDepthArray.push(didHitDepth)
 
-    var buf = canvas.toBuffer();
+    var buf = orginalCanvas.toBuffer();
     // return buf
     // fs.writeFileSync("test.png", buf);
     console.log("buffer for image is about to be returned")
