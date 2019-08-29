@@ -6,7 +6,7 @@ module.exports = {
   deploy: {
     production: {
       user: 'ubuntu',
-	host: 'ec2-13-57-57-47.us-west-1.compute.amazonaws.com',
+	host: 'ec2-54-153-63-227.us-west-1.compute.amazonaws.com',
       key: '~/desktop/pose.pem',
       ref: 'origin/master',
       repo: 'https://github.com/vitae-gravitas/pose-server.git',
